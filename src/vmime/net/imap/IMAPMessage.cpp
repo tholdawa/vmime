@@ -299,6 +299,8 @@ void IMAPMessage::extractImpl
 		}
 	}
 
+	bool serverIsGmail(m_folder.lock() -> getStore() -> getConnectionInfos() -> getHost() == "imap.gmail.com");
+
 	// Build the request text
 	std::ostringstream command;
 	command.imbue(std::locale::classic());
@@ -342,7 +344,7 @@ void IMAPMessage::extractImpl
 		if ((extractFlags & EXTRACT_HEADER) && (extractFlags & EXTRACT_BODY))
 			throw exceptions::operation_not_supported();
 		// body only
-		else if (extractFlags & EXTRACT_BODY)
+		else if ((extractFlags & EXTRACT_BODY) && !serverIsGmail)
 			command << ".TEXT";
 		// header only
 		else if (extractFlags & EXTRACT_HEADER)
